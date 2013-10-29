@@ -1,0 +1,318 @@
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
+
+CREATE SCHEMA IF NOT EXISTS `esi_pj` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci ;
+USE `esi_pj` ;
+
+-- -----------------------------------------------------
+-- Table `esi_pj`.`Rua`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `esi_pj`.`Rua` ;
+
+CREATE TABLE IF NOT EXISTS `esi_pj`.`Rua` (
+  `idRua` INT NOT NULL AUTO_INCREMENT,
+  `nomeRua` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`idRua`),
+  UNIQUE INDEX `nomeRua_UNIQUE` (`nomeRua` ASC))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `esi_pj`.`Bairro`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `esi_pj`.`Bairro` ;
+
+CREATE TABLE IF NOT EXISTS `esi_pj`.`Bairro` (
+  `idBairro` INT NOT NULL AUTO_INCREMENT,
+  `nomeBairro` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`idBairro`),
+  UNIQUE INDEX `nomeBairro_UNIQUE` (`nomeBairro` ASC))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `esi_pj`.`Estado`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `esi_pj`.`Estado` ;
+
+CREATE TABLE IF NOT EXISTS `esi_pj`.`Estado` (
+  `idEstado` INT NOT NULL AUTO_INCREMENT,
+  `nomeEstado` VARCHAR(45) NOT NULL,
+  `siglaEstado` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`idEstado`),
+  UNIQUE INDEX `nomeEstado_UNIQUE` (`nomeEstado` ASC),
+  UNIQUE INDEX `siglaEstado_UNIQUE` (`siglaEstado` ASC))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `esi_pj`.`Cidade`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `esi_pj`.`Cidade` ;
+
+CREATE TABLE IF NOT EXISTS `esi_pj`.`Cidade` (
+  `idCidade` INT NOT NULL AUTO_INCREMENT,
+  `nomeCidade` VARCHAR(45) NOT NULL,
+  `idEstado` INT NOT NULL,
+  PRIMARY KEY (`idCidade`),
+  UNIQUE INDEX `nomeCidade_UNIQUE` (`nomeCidade` ASC),
+  INDEX `fk_Cidade_Estado1_idx` (`idEstado` ASC),
+  CONSTRAINT `fk_Cidade_Estado1`
+    FOREIGN KEY (`idEstado`)
+    REFERENCES `esi_pj`.`Estado` (`idEstado`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `esi_pj`.`Logradouro`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `esi_pj`.`Logradouro` ;
+
+CREATE TABLE IF NOT EXISTS `esi_pj`.`Logradouro` (
+  `idLogradouro` INT NOT NULL AUTO_INCREMENT,
+  `nomeLogradouro` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`idLogradouro`),
+  UNIQUE INDEX `nomeLogradouro_UNIQUE` (`nomeLogradouro` ASC))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `esi_pj`.`Endereco`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `esi_pj`.`Endereco` ;
+
+CREATE TABLE IF NOT EXISTS `esi_pj`.`Endereco` (
+  `idEndereco` INT NOT NULL AUTO_INCREMENT,
+  `cep` VARCHAR(45) NOT NULL,
+  `idLogradouro` INT NOT NULL,
+  `idRua` INT NOT NULL,
+  `idBairro` INT NOT NULL,
+  `idCidade` INT NOT NULL,
+  PRIMARY KEY (`idEndereco`),
+  INDEX `fk_Endereco_Logradouro_idx` (`idLogradouro` ASC),
+  INDEX `fk_Endereco_Rua1_idx` (`idRua` ASC),
+  INDEX `fk_Endereco_Bairro1_idx` (`idBairro` ASC),
+  INDEX `fk_Endereco_Cidade1_idx` (`idCidade` ASC),
+  CONSTRAINT `fk_Endereco_Logradouro`
+    FOREIGN KEY (`idLogradouro`)
+    REFERENCES `esi_pj`.`Logradouro` (`idLogradouro`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Endereco_Rua1`
+    FOREIGN KEY (`idRua`)
+    REFERENCES `esi_pj`.`Rua` (`idRua`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Endereco_Bairro1`
+    FOREIGN KEY (`idBairro`)
+    REFERENCES `esi_pj`.`Bairro` (`idBairro`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Endereco_Cidade1`
+    FOREIGN KEY (`idCidade`)
+    REFERENCES `esi_pj`.`Cidade` (`idCidade`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `esi_pj`.`Forum`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `esi_pj`.`Forum` ;
+
+CREATE TABLE IF NOT EXISTS `esi_pj`.`Forum` (
+  `idForum` INT NOT NULL AUTO_INCREMENT,
+  `nomeForum` VARCHAR(45) NOT NULL,
+  `numero` INT NOT NULL,
+  `complemento` VARCHAR(45) NOT NULL,
+  `cnpj` VARCHAR(45) NOT NULL,
+  `telefone` VARCHAR(45) NOT NULL,
+  `idEndereco` INT NOT NULL,
+  PRIMARY KEY (`idForum`),
+  UNIQUE INDEX `nomeForum_UNIQUE` (`nomeForum` ASC),
+  UNIQUE INDEX `cnpj_UNIQUE` (`cnpj` ASC),
+  INDEX `fk_Forum_Endereco1_idx` (`idEndereco` ASC),
+  CONSTRAINT `fk_Forum_Endereco1`
+    FOREIGN KEY (`idEndereco`)
+    REFERENCES `esi_pj`.`Endereco` (`idEndereco`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `esi_pj`.`Advogado`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `esi_pj`.`Advogado` ;
+
+CREATE TABLE IF NOT EXISTS `esi_pj`.`Advogado` (
+  `idAdvogado` INT NOT NULL AUTO_INCREMENT,
+  `nomeAdvogado` VARCHAR(45) NOT NULL,
+  `cpf` VARCHAR(45) NOT NULL,
+  `rg` VARCHAR(45) NOT NULL,
+  `oab` VARCHAR(45) NOT NULL,
+  `sexo` VARCHAR(45) NOT NULL,
+  `nascimento` DATE NOT NULL,
+  `telefone` VARCHAR(45) NOT NULL,
+  `idEndereco` INT NOT NULL,
+  PRIMARY KEY (`idAdvogado`),
+  UNIQUE INDEX `cpf_UNIQUE` (`cpf` ASC),
+  UNIQUE INDEX `rg_UNIQUE` (`rg` ASC),
+  UNIQUE INDEX `oab_UNIQUE` (`oab` ASC),
+  INDEX `fk_Advogado_Endereco1_idx` (`idEndereco` ASC),
+  CONSTRAINT `fk_Advogado_Endereco1`
+    FOREIGN KEY (`idEndereco`)
+    REFERENCES `esi_pj`.`Endereco` (`idEndereco`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `esi_pj`.`Cliente`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `esi_pj`.`Cliente` ;
+
+CREATE TABLE IF NOT EXISTS `esi_pj`.`Cliente` (
+  `idCliente` INT NOT NULL AUTO_INCREMENT,
+  `nomeCliente` VARCHAR(45) NOT NULL,
+  `cpf` VARCHAR(45) NULL,
+  `rg` VARCHAR(45) NULL,
+  `cnpj` VARCHAR(45) NULL,
+  `sexo` VARCHAR(45) NOT NULL,
+  `nascimento` VARCHAR(45) NOT NULL,
+  `telefone` VARCHAR(45) NOT NULL,
+  `idEndereco` INT NOT NULL,
+  PRIMARY KEY (`idCliente`),
+  UNIQUE INDEX `cpf_UNIQUE` (`cpf` ASC),
+  UNIQUE INDEX `rg_UNIQUE` (`rg` ASC),
+  UNIQUE INDEX `cnpj_UNIQUE` (`cnpj` ASC),
+  INDEX `fk_Cliente_Endereco1_idx` (`idEndereco` ASC),
+  CONSTRAINT `fk_Cliente_Endereco1`
+    FOREIGN KEY (`idEndereco`)
+    REFERENCES `esi_pj`.`Endereco` (`idEndereco`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `esi_pj`.`TipoTramite`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `esi_pj`.`TipoTramite` ;
+
+CREATE TABLE IF NOT EXISTS `esi_pj`.`TipoTramite` (
+  `idTipoTramite` INT NOT NULL AUTO_INCREMENT,
+  `nomeTipoTramite` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`idTipoTramite`),
+  UNIQUE INDEX `nomeTipoTramite_UNIQUE` (`nomeTipoTramite` ASC))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `esi_pj`.`TipoProcesso`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `esi_pj`.`TipoProcesso` ;
+
+CREATE TABLE IF NOT EXISTS `esi_pj`.`TipoProcesso` (
+  `idTipoProcesso` INT NOT NULL AUTO_INCREMENT,
+  `nomeTipoProcesso` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`idTipoProcesso`),
+  UNIQUE INDEX `nomeTipoProcesso_UNIQUE` (`nomeTipoProcesso` ASC))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `esi_pj`.`Situacao`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `esi_pj`.`Situacao` ;
+
+CREATE TABLE IF NOT EXISTS `esi_pj`.`Situacao` (
+  `idSituacao` INT NOT NULL AUTO_INCREMENT,
+  `nomeSituacao` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`idSituacao`),
+  UNIQUE INDEX `nomeSituacao_UNIQUE` (`nomeSituacao` ASC))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `esi_pj`.`Processo`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `esi_pj`.`Processo` ;
+
+CREATE TABLE IF NOT EXISTS `esi_pj`.`Processo` (
+  `numeroProcesso` INT NOT NULL AUTO_INCREMENT,
+  `abertura` DATE NOT NULL,
+  `descricao` VARCHAR(45) NOT NULL,
+  `idForum` INT NOT NULL,
+  `idCliente` INT NOT NULL,
+  `idAdvogado` INT NOT NULL,
+  `idTipoProcesso` INT NOT NULL,
+  `idSituacao` INT NOT NULL,
+  PRIMARY KEY (`numeroProcesso`),
+  INDEX `fk_Processo_Forum1_idx` (`idForum` ASC),
+  INDEX `fk_Processo_Cliente1_idx` (`idCliente` ASC),
+  INDEX `fk_Processo_Advogado1_idx` (`idAdvogado` ASC),
+  INDEX `fk_Processo_TipoProcesso1_idx` (`idTipoProcesso` ASC),
+  INDEX `fk_Processo_Situacao1_idx` (`idSituacao` ASC),
+  CONSTRAINT `fk_Processo_Forum1`
+    FOREIGN KEY (`idForum`)
+    REFERENCES `esi_pj`.`Forum` (`idForum`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Processo_Cliente1`
+    FOREIGN KEY (`idCliente`)
+    REFERENCES `esi_pj`.`Cliente` (`idCliente`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Processo_Advogado1`
+    FOREIGN KEY (`idAdvogado`)
+    REFERENCES `esi_pj`.`Advogado` (`idAdvogado`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Processo_TipoProcesso1`
+    FOREIGN KEY (`idTipoProcesso`)
+    REFERENCES `esi_pj`.`TipoProcesso` (`idTipoProcesso`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Processo_Situacao1`
+    FOREIGN KEY (`idSituacao`)
+    REFERENCES `esi_pj`.`Situacao` (`idSituacao`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `esi_pj`.`Tramite`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `esi_pj`.`Tramite` ;
+
+CREATE TABLE IF NOT EXISTS `esi_pj`.`Tramite` (
+  `numeroProcesso` INT NOT NULL,
+  `idTipoTramite` INT NOT NULL,
+  `obs` VARCHAR(45) NULL,
+  `data` DATE NOT NULL,
+  PRIMARY KEY (`numeroProcesso`, `idTipoTramite`),
+  INDEX `fk_Processo_has_TipoTramite_TipoTramite1_idx` (`idTipoTramite` ASC),
+  INDEX `fk_Processo_has_TipoTramite_Processo1_idx` (`numeroProcesso` ASC),
+  CONSTRAINT `fk_Processo_has_TipoTramite_Processo1`
+    FOREIGN KEY (`numeroProcesso`)
+    REFERENCES `esi_pj`.`Processo` (`numeroProcesso`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Processo_has_TipoTramite_TipoTramite1`
+    FOREIGN KEY (`idTipoTramite`)
+    REFERENCES `esi_pj`.`TipoTramite` (`idTipoTramite`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
