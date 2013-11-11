@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
+	<classpathentry kind="lib" path="/home/wellinthon/git/esi_processo_juridico/JAR/ProcessoJuridico_Negocio.jar"/>
+	<classpathentry kind="lib" path="/home/wellinthon/git/esi_processo_juridico/JAR/ProcessoJuridico_BO.jar"/>
+	<classpathentry kind="lib" path="/home/wellinthon/git/esi_processo_juridico/JAR/mysql-connector-java-5.1.26-bin.jar"/>
+	<classpathentry kind="lib" path="/home/wellinthon/git/esi_processo_juridico/JAR/Infra.jar"/>
+	<classpathentry kind="lib" path="/home/wellinthon/git/esi_processo_juridico/JAR/Geral_Negocio.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
