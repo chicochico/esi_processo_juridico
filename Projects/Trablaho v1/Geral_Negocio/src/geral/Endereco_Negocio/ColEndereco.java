@@ -6,6 +6,7 @@ import infra.ConexaoBD;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
 
 public class ColEndereco {
 	private ConexaoBD conexao;
@@ -112,6 +113,34 @@ public class ColEndereco {
 			endereco.getEndereco().setLogradouro(colLogradouro.getLogradouroWithID(endereco.getEndereco().getLogradouro()));
 		}
 		return endereco;
+	}
+	
+	public ArrayList<EnderecoEspecifico> getEnderecoWithCEP(String cep) throws Exception {
+		ColBairro colBairro = new ColBairro(conexao);
+		ColCidade colCidade = new ColCidade(conexao);
+		ColLogradouro colLogradouro = new ColLogradouro(conexao);
+		ColRua colRua = new ColRua(conexao);
+		
+		String sql = String.format("SELECT * FROM Endereco WHERE cep = '%s'", cep);
+		ResultSet rs = conexao.execSelect(sql);
+		ArrayList<EnderecoEspecifico> enderecos = new ArrayList<EnderecoEspecifico>();
+		
+		while (rs.next()) {
+			EnderecoEspecifico endereco = new EnderecoEspecifico();
+			endereco.setId(rs.getInt("idEndereco"));
+			endereco.getEndereco().setCep(rs.getString("cep"));
+			endereco.getEndereco().getBairro().setId(rs.getInt("idBairro"));
+			endereco.getEndereco().getCidade().setId(rs.getInt("idCidade"));
+			endereco.getEndereco().getRua().setId(rs.getInt("idRua"));
+			endereco.getEndereco().getLogradouro().setId(rs.getInt("idLogradouro"));
+			
+			endereco.getEndereco().setBairro(colBairro.getBairroWithID(endereco.getEndereco().getBairro()));
+			endereco.getEndereco().setCidade(colCidade.getCidadeWithID(endereco.getEndereco().getCidade()));
+			endereco.getEndereco().setRua(colRua.getRuaWithID(endereco.getEndereco().getRua()));
+			endereco.getEndereco().setLogradouro(colLogradouro.getLogradouroWithID(endereco.getEndereco().getLogradouro()));
+			enderecos.add(endereco);
+		}
+		return enderecos;
 	}
 
 	private void validateEndereco(EnderecoEspecifico endereco) throws Exception {

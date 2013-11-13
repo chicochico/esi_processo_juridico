@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import processo_juridico.Advogado;
 
 import geral.Sexo;
-import geral.Endereco_Negocio.ColEndereco;
 import infra.ConexaoBD;
 
 public class Col_Advogado {
@@ -37,10 +36,7 @@ public class Col_Advogado {
 			advogado.setOab(rs.getString("oab"));
 			advogado.setSexo(new Sexo(rs.getString("sexo")));
 			advogado.setNascimento(rs.getDate("nascimento"));
-//			advogado.setTelefone(new Telefone(rs.getString("telefone")));
-			
-			ColEndereco colEndereco = new ColEndereco(conexao);
-			advogado.setEnderecoEspecifico(colEndereco.getEnderecoWithID(rs.getInt("idEndereco")));
+			advogado.getEnderecoEspecifico().setId(rs.getInt("idEndereco"));
 		}
 		return advogado;
 	}
@@ -48,7 +44,7 @@ public class Col_Advogado {
 	public ArrayList<Advogado> recuperarTodosAdvogados() throws Exception {
 		String sql = "SELECT * FROM Advogado";
 		ResultSet rs = conexao.execSelect(sql);
-		ArrayList<Advogado> advogados = new ArrayList<>();
+		ArrayList<Advogado> advogados = new ArrayList<Advogado>();
 		
 		while (rs.next()) {
 			Advogado advogado = new Advogado();
@@ -59,10 +55,7 @@ public class Col_Advogado {
 			advogado.setOab(rs.getString("oab"));
 			advogado.setSexo(new Sexo(rs.getString("sexo")));
 			advogado.setNascimento(rs.getDate("nascimento"));
-//			advogado.setTelefone(new Telefone(rs.getString("telefone")));
-			
-			ColEndereco colEndereco = new ColEndereco(conexao);
-			advogado.setEnderecoEspecifico(colEndereco.getEnderecoWithID(rs.getInt("idEndereco")));
+			advogado.getEnderecoEspecifico().setId(rs.getInt("idEndereco"));
 			advogados.add(advogado);
 		}
 		return advogados;

@@ -3,7 +3,6 @@ package col_cliente;
 import geral.PessoaFisica;
 import geral.PessoaJuridica;
 import geral.Sexo;
-import geral.Endereco_Negocio.ColEndereco;
 import infra.ConexaoBD;
 
 import java.sql.ResultSet;
@@ -43,10 +42,7 @@ public class Col_Cliente {
 			}
 			cliente.getPessoa().setNome(rs.getString("nomeCliente"));
 			cliente.getPessoa().setNascimento(rs.getDate("nascimento"));
-//			cliente.getPessoa().setTelefone(new Telefone(rs.getString("telefone")));
-			
-			ColEndereco colEndereco = new ColEndereco(conexao);
-			cliente.getPessoa().setEnderecoEspecifico(colEndereco.getEnderecoWithID(rs.getInt("idEndereco")));
+			cliente.getPessoa().getEnderecoEspecifico().setId(rs.getInt("idEndereco"));
 		}
 		return cliente;
 	}
@@ -55,7 +51,7 @@ public class Col_Cliente {
 	public ArrayList<Cliente> recuperarTodosClientes() throws Exception {
 		String sql = "SELECT * FROM Cliente";
 		ResultSet rs = conexao.execSelect(sql);
-		ArrayList<Cliente> clientes = new ArrayList<>();
+		ArrayList<Cliente> clientes = new ArrayList<Cliente>();
 		
 		while (rs.next()) {
 			Cliente cliente = new Cliente();
@@ -73,10 +69,7 @@ public class Col_Cliente {
 			}
 			cliente.getPessoa().setNome(rs.getString("nomeCliente"));
 			cliente.getPessoa().setNascimento(rs.getDate("nascimento"));
-//			cliente.getPessoa().setTelefone(new Telefone(rs.getString("telefone")));
-			
-			ColEndereco colEndereco = new ColEndereco(conexao);
-			cliente.getPessoa().setEnderecoEspecifico(colEndereco.getEnderecoWithID(rs.getInt("idEndereco")));
+			cliente.getPessoa().getEnderecoEspecifico().setId(rs.getInt("idEndereco"));
 			clientes.add(cliente);
 		}
 		return clientes;

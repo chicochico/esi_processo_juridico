@@ -39,6 +39,7 @@ public class ColEstado {
 		return estado;
 	}
 	
+	
 	public Estado getEstadoWithID(Estado estado) throws Exception {
 		String sql = "SELECT * FROM Estado WHERE idEstado = " + estado.getId();
 		ResultSet rs = conexao.execSelect(sql);

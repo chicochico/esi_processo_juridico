@@ -1,7 +1,10 @@
 package processo_juridico;
 
-public class Situacao {
+import java.io.Serializable;
 
+public class Situacao implements Serializable{
+	public final static long serialVersionUID = 1;
+	
 	private int id;
 	private String nome;
 	

@@ -1,6 +1,5 @@
 package col_forum;
 
-import geral.Endereco_Negocio.ColEndereco;
 import infra.ConexaoBD;
 
 import java.sql.ResultSet;
@@ -29,10 +28,7 @@ public class Col_Forum {
 			forum.setId(id);
 			forum.setNome(rs.getString("nomeForum"));
 			forum.setCnpj(rs.getString("cnpj"));
-//			forum.setTelefone(new Telefone(rs.getString("telefone")));
-			
-			ColEndereco colEndereco = new ColEndereco(conexao);
-			forum.setEnderecoEspecifico(colEndereco.getEnderecoWithID(rs.getInt("idEndereco")));
+			forum.getEnderecoEspecifico().setId(rs.getInt("idEndereco"));
 		}
 		return forum;
 	}
@@ -40,17 +36,14 @@ public class Col_Forum {
 	public ArrayList<Forum> recuperarTodosForuns() throws Exception {
 		String sql = "SELECT * FROM Forum";
 		ResultSet rs = conexao.execSelect(sql);
-		ArrayList<Forum> foruns = new ArrayList<>();
+		ArrayList<Forum> foruns = new ArrayList<Forum>();
 		
 		while (rs.next()) {
 			Forum forum = new Forum();
 			forum.setId(rs.getInt("idForum"));
 			forum.setNome(rs.getString("nomeForum"));
 			forum.setCnpj(rs.getString("cnpj"));
-//			forum.setTelefone(new Telefone(rs.getString("telefone")));
-			
-			ColEndereco colEndereco = new ColEndereco(conexao);
-			forum.setEnderecoEspecifico(colEndereco.getEnderecoWithID(rs.getInt("idEndereco")));
+			forum.getEnderecoEspecifico().setId(rs.getInt("idEndereco"));
 			foruns.add(forum);
 		}
 		return foruns;

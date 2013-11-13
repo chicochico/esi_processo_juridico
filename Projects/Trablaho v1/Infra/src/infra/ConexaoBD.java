@@ -7,17 +7,13 @@ public class ConexaoBD {
     protected ResultSet tabela;
     
 	// *************************************************
-    public ConexaoBD() throws ClassNotFoundException{
-//    	String driver = "org.gjt.mm.mysql.Driver";
-//        Class.forName(driver);
+    public ConexaoBD(){
     }
-    
+        
     // *************************************************    
-    public void conectar(UsuarioBD usuario) throws Exception{
-    	String url = "jdbc:mysql://localhost:3306/" + usuario.getBanco() + "?";
-    	String user = "user=" + usuario.getUsuario();
-    	String password = "&password=" + usuario.getSenha();
-    	connection = DriverManager.getConnection(url + user + password); 
+    public void conectar() throws Exception {
+    	ConnectionJDBC conJDBC = new ConnectionJDBC();
+    	connection = conJDBC.getConnection();
     	connection.setAutoCommit(false);
     }
     

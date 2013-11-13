@@ -9,6 +9,7 @@ import processo_juridico.Cliente;
 import col_cliente.Col_Cliente;
 
 public class UC_ClienteManager {
+	
 	public Cliente recuperarClienteWithID(int id) throws Exception {
 		ConexaoBD conexao = GlobalApp.getConexaoBD();
 		Col_Cliente colCliente = new Col_Cliente(conexao);

@@ -29,7 +29,7 @@ public class Col_Tramite {
 	public ArrayList<Tramite> recuperarTramitesWithNumeroProcesso(int numeroProcesso) throws Exception {
 		String sql = String.format("SELECT * FROM Tramite WHERE numeroProcesso = %d", numeroProcesso);
 		ResultSet rs = conexao.execSelect(sql);
-		ArrayList<Tramite> tramites = new ArrayList<>();
+		ArrayList<Tramite> tramites = new ArrayList<Tramite>();
 		while (rs.next()) {
 			Tramite tramite = new Tramite();
 			tramite.setObs(rs.getString("obs"));

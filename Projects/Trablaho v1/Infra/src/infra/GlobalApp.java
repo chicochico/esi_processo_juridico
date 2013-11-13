@@ -22,11 +22,7 @@ public class GlobalApp {
     public static ConexaoBD getConexaoBD() throws Exception  {
     	if (conexaoBD == null || conexaoBD.isClosed()) {
             conexaoBD = new ConexaoBD();
-            UsuarioBD usuario = new UsuarioBD();
-            usuario.setSenha("root");
-            usuario.setBanco("esi_pj");
-            usuario.setUsuario("root");
-            conexaoBD.conectar(usuario);
+            conexaoBD.conectar();
     	}
     	return conexaoBD;
     }

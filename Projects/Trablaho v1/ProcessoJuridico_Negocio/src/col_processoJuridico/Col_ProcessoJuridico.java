@@ -1,26 +1,20 @@
 package col_processoJuridico;
 
+import infra.ConexaoBD;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 
 import processo_juridico.Advogado;
+import processo_juridico.Cliente;
+import processo_juridico.Forum;
 import processo_juridico.ProcessoJuridico;
 import processo_juridico.Situacao;
 import processo_juridico.TipoProcesso;
-import processo_juridico.TipoTramite;
-import processo_juridico.Tramite;
-
-import col_advogado.Col_Advogado;
-import col_cliente.Col_Cliente;
-import col_forum.Col_Forum;
-import col_tramite.Col_Tramite;
 
 import com.mysql.jdbc.PreparedStatement;
-
-import infra.ConexaoBD;
 
 public class Col_ProcessoJuridico {
 	private ConexaoBD conexao;
@@ -35,11 +29,20 @@ public class Col_ProcessoJuridico {
 		this.conexao = conexao;
 	}
 	
+	public TipoProcesso recuperarTipoProcessoWithID(int id) throws Exception {
+		String sql = "SELECT * FROM TipoProcesso WHERE idTipoProcesso = " + id;
+		ResultSet rs = conexao.execSelect(sql);
+		TipoProcesso tipo = null;
+		if(rs.next()) {
+			tipo = new TipoProcesso(rs.getInt("idTipoProcesso"), rs.getString("nomeTipoProcesso"));
+		}
+		return tipo;
+	}
 	
 	public ArrayList<TipoProcesso> recuperarTodosTipoProcesso() throws Exception {
 		String sql = "SELECT * FROM TipoProcesso";
 		ResultSet rs = conexao.execSelect(sql);
-		ArrayList<TipoProcesso> tipos = new ArrayList<>();
+		ArrayList<TipoProcesso> tipos = new ArrayList<TipoProcesso>();
 		while(rs.next()) {
 			tipos.add(new TipoProcesso(rs.getInt("idTipoProcesso"), rs.getString("nomeTipoProcesso")));
 		}
@@ -77,13 +80,6 @@ public class Col_ProcessoJuridico {
 		rs.last();
 		processo.setNumero(rs.getInt(1));
 		
-		Col_Tramite colTramite = new Col_Tramite(conexao);
-		Tramite tramite = new Tramite("Tramite de abertura", new Date(), new TipoTramite("Abertura"));
-		processo.getTramites().add(0, tramite);
-		for(int i=0; i < processo.getTramites().size(); i++) {
-			colTramite.addTramiteAoProcessoNumero(processo.getTramites().get(i), processo.getNumero());
-		}
-		
 		return processo;
 	}
 	
@@ -103,13 +99,6 @@ public class Col_ProcessoJuridico {
 		ResultSet rs = conexao.execSelect("SELECT LAST_INSERT_ID()");
 		rs.last();
 		processo.setNumero(rs.getInt(1));
-		
-		Col_Tramite colTramite = new Col_Tramite(conexao);
-		Tramite tramite = new Tramite("Lancamento da Situacao", new Date(), new TipoTramite(processo.getSituacao().getNome()));
-		processo.getTramites().add(tramite);
-		for(int i=0; i < processo.getTramites().size(); i++) {
-			colTramite.addTramiteAoProcessoNumero(processo.getTramites().get(i), processo.getNumero());
-		}
 		
 		return processo;
 	}
@@ -135,28 +124,25 @@ public class Col_ProcessoJuridico {
 		if (rs.next()) {
 			processo = new ProcessoJuridico();
 			
-			Col_Cliente colCliente = new Col_Cliente(conexao);
-			Col_Advogado colAdvogado = new Col_Advogado(conexao);
-			Col_Forum colForum = new Col_Forum(conexao);
-			Col_Tramite colTramite = new Col_Tramite(conexao);
-			
+			processo.setNumero(rs.getInt("numeroProcesso"));
 			processo.setAbertura(rs.getDate("abertura"));
-			processo.setCliente(colCliente.recuperarClienteWithID(rs.getInt("idCliente")));
 			processo.setDescricao(rs.getString("descricao"));
-			processo.setForum(colForum.recuperarForumWithID(rs.getInt("idForum")));
-			processo.setResponsavel(colAdvogado.recuperarAdvogadoWithID(rs.getInt("idAdvogado")));
-			processo.setTramites(colTramite.recuperarTramitesWithNumeroProcesso(processo.getNumero()));
+			
+			Cliente cliente = new Cliente(rs.getInt("idCliente"), null);
+			processo.setCliente(cliente);
+			
+			Forum forum = new Forum(rs.getInt("idForum"));
+			processo.setForum(forum);
+			
+			Advogado responsavel = new Advogado(rs.getInt("idAdvogado"), null);
+			processo.setResponsavel(responsavel);
 			
 			Situacao situacao = new Situacao();
 			situacao.setId(rs.getInt("situacao"));
 			processo.setSituacao(situacao);
 			
-			sql = String.format("SELECT * FROM TipoProcesso WHERE idTipoProcesso = %d", rs.getInt("idTipoProcesso"));
-			ResultSet rs1 = conexao.execSelect(sql);
-			if (rs1.next()) {
-				TipoProcesso tipoProcesso = new TipoProcesso(rs1.getInt("idTipoProcesso"), rs1.getString("nomeTipoProcesso"));
-				processo.setTipoProcesso(tipoProcesso);
-			}
+			TipoProcesso tipoProcesso = this.recuperarTipoProcessoWithID(rs.getInt("idTipoProcesso"));
+			processo.setTipoProcesso(tipoProcesso);
 		}
 		
 		return processo;
@@ -166,34 +152,33 @@ public class Col_ProcessoJuridico {
 	
 	
 	public ArrayList<ProcessoJuridico> recuperarTodosProcessos() throws Exception {
-		ArrayList<ProcessoJuridico> processos = new ArrayList<>();
+		ArrayList<ProcessoJuridico> processos = new ArrayList<ProcessoJuridico>();
 		String sql = "SELECT * FROM Processo";
 		ResultSet rs = conexao.execSelect(sql);
 		
 		while (rs.next()) {
-			Col_Cliente colCliente = new Col_Cliente(conexao);
-			Col_Advogado colAdvogado = new Col_Advogado(conexao);
-			Col_Forum colForum = new Col_Forum(conexao);
-			Col_Tramite colTramite = new Col_Tramite(conexao);
-			
 			ProcessoJuridico processo = new ProcessoJuridico();
+			
+			processo.setNumero(rs.getInt("numeroProcesso"));
 			processo.setAbertura(rs.getDate("abertura"));
-			processo.setCliente(colCliente.recuperarClienteWithID(rs.getInt("idCliente")));
 			processo.setDescricao(rs.getString("descricao"));
-			processo.setForum(colForum.recuperarForumWithID(rs.getInt("idForum")));
-			processo.setResponsavel(colAdvogado.recuperarAdvogadoWithID(rs.getInt("idAdvogado")));
-			processo.setTramites(colTramite.recuperarTramitesWithNumeroProcesso(processo.getNumero()));
+			
+			Cliente cliente = new Cliente(rs.getInt("idCliente"), null);
+			processo.setCliente(cliente);
+			
+			Forum forum = new Forum(rs.getInt("idForum"));
+			processo.setForum(forum);
+			
+			Advogado responsavel = new Advogado(rs.getInt("idAdvogado"), null);
+			processo.setResponsavel(responsavel);
 			
 			Situacao situacao = new Situacao();
 			situacao.setId(rs.getInt("situacao"));
 			processo.setSituacao(situacao);
 			
-			sql = String.format("SELECT * FROM TipoProcesso WHERE idTipoProcesso = %d", rs.getInt("idTipoProcesso"));
-			ResultSet rs1 = conexao.execSelect(sql);
-			if (rs1.next()) {
-				TipoProcesso tipoProcesso = new TipoProcesso(rs.getInt("idTipoProceso"), rs.getString("nomeTipoProcesso"));
-				processo.setTipoProcesso(tipoProcesso);
-			}
+			TipoProcesso tipoProcesso = this.recuperarTipoProcessoWithID(rs.getInt("idTipoProcesso"));
+			processo.setTipoProcesso(tipoProcesso);
+			
 			processos.add(processo);
 		}
 		return processos;
